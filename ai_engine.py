@@ -1,32 +1,30 @@
-import os
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import os
 
-# Get correct file path (important for Render)
+# Load model (small and lightweight)
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-knowledge_path = os.path.join(BASE_DIR, "security_knowledge.txt")
+kb_path = os.path.join(BASE_DIR, "knowledge_base.txt")
 
-# Load knowledge base
-with open(knowledge_path, "r", encoding="utf-8") as f:
-    knowledge_base = f.read().split("\n\n")
+# Load knowledge
+with open(kb_path, "r", encoding="utf-8") as f:
+    knowledge = f.read().split("\n\n")
 
-# Convert knowledge text into vectors
-vectorizer = TfidfVectorizer()
-vectors = vectorizer.fit_transform(knowledge_base)
+# Create embeddings
+embeddings = model.encode(knowledge)
 
+def generate_response(query):
 
-def generate_response(user_input):
+    if not query.strip():
+        return "Please type a question."
 
-    if not user_input:
-        return "Please ask a cybersecurity question."
+    query_embedding = model.encode([query])
 
-    # Convert user input into vector
-    user_vector = vectorizer.transform([user_input])
+    similarity = cosine_similarity(query_embedding, embeddings)
 
-    # Find similarity
-    similarity = cosine_similarity(user_vector, vectors)
+    index = np.argmax(similarity)
 
-    # Get best answer
-    best_index = similarity.argmax()
-
-    return knowledge_base[best_index]
+    return knowledge[index]

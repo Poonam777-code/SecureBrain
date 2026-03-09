@@ -214,3 +214,134 @@ Creativity is the ability to generate new ideas and innovative solutions.
 Innovation refers to creating new methods, ideas, or products.
 
 Entrepreneurship is the process of starting and managing a business venture.
+Python is a high-level programming language widely used for web development, AI, and data science.
+Java is an object-oriented programming language used for building applications from web to mobile.
+C++ is a programming language used for system software, game development, and high-performance applications.
+Artificial Intelligence is the simulation of human intelligence in machines that can learn, reason, and problem-solve.
+Machine Learning is a subset of AI that enables systems to learn patterns from data and make predictions.
+Deep Learning is a type of machine learning based on neural networks with many layers.
+Data Science involves extracting insights from structured and unstructured data using statistical and computational methods.
+HTML is a markup language used to create the structure of web pages.
+CSS is a style sheet language used to design and layout web pages.
+JavaScript is a programming language used to make web pages interactive and dynamic.
+React is a JavaScript library for building user interfaces.
+Flask is a Python microframework for building web applications.
+Django is a Python web framework for building robust applications quickly.
+Blockchain is a distributed ledger technology used to store data securely and transparently.
+Cryptocurrency is a digital currency that uses blockchain technology for secure transactions.
+Quantum Computing uses principles of quantum mechanics to perform computations much faster than classical computers.
+Renewable energy comes from sources like solar, wind, hydro, and geothermal power.
+Climate change is the long-term alteration of temperature and weather patterns, mainly due to human activities.
+Electric vehicles are cars that use electric motors powered by batteries instead of internal combustion engines.
+Robotics involves designing, building, and operating robots for various applications.
+The Internet of Things (IoT) is a network of physical devices connected to the internet for data exchange and automation.
+Cybersecurity involves protecting systems, networks, and data from digital attacks.
+Cloud computing provides on-demand access to computing resources over the internet.
+Augmented Reality overlays digital information on the real world for enhanced experiences.
+Virtual Reality immerses users in a computer-generated 3D environment.
+Big Data refers to extremely large datasets that can be analyzed for insights and trends.
+3D printing is a manufacturing process that creates objects layer by layer from digital models.
+Genetic engineering is the modification of an organism's DNA to achieve desired traits.
+Space exploration involves sending spacecraft and humans to explore outer space.
+The Earth revolves around the Sun once every 365 days.
+Water boils at 100 degrees Celsius at sea level.
+Newton's laws of motion describe the relationship between a body and the forces acting on it.
+Projects can involve coding, robotics, AI, electronics, or scientific experiments depending on the field.
+Renewable energy projects often focus on solar panels, wind turbines, or hydropower systems.
+AI projects may include chatbots, recommendation systems, or computer vision applications.
+Science projects can cover physics, chemistry, biology, or environmental studies.
+Electronics projects include building circuits, sensors, and microcontroller-based devices.
+Mobile app development involves designing, coding, and deploying apps for Android or iOS.
+Web development projects include creating websites, web apps, and e-commerce platforms.
+Data analysis projects involve cleaning, processing, and visualizing datasets to find insights.
+Machine learning projects include training models for predictions, classification, or clustering tasks.
+Robotics projects involve designing, programming, and testing robots for automation tasks.
+Cybersecurity projects involve penetration testing, vulnerability scanning, and network security improvements.
+Cloud projects involve deploying apps, storing data, and managing cloud infrastructure.
+Renewable energy science includes studying solar panels, wind energy, and energy efficiency technologies.
+AI stands for Artificial Intelligence, which allows machines to mimic human intelligence.
+A neural network is a computational model inspired by the human brain used in machine learning.
+Supervised learning is a type of machine learning where models are trained on labeled data.
+Unsupervised learning is a machine learning method where the model finds patterns without labeled output.
+Reinforcement learning is a type of machine learning where agents learn by trial and error using rewards.
+Git is a version control system used to track code changes in software development.
+GitHub is a platform for hosting Git repositories and collaborating on code projects.
+Docker is a tool to create, deploy, and run applications in containers.
+Kubernetes is an open-source system for automating deployment and scaling of containerized applications.
+APIs allow different software systems to communicate and exchange data.
+JSON is a lightweight data-interchange format often used in APIs.
+REST stands for Representational State Transfer, a web service architecture style.
+HTTP is the protocol used for transferring data on the web.
+HTTPS is the secure version of HTTP, using encryption to protect data.
+SQL is a language used to manage and query relational databases.
+NoSQL databases store data in formats other than tables, such as documents or key-value pairs.
+Big-O notation describes the efficiency of algorithms in terms of time or space complexity.
+A binary search algorithm finds an element in a sorted list in logarithmic time.
+A bubble sort algorithm repeatedly swaps adjacent elements to sort a list.
+Cloud storage allows users to save data on remote servers accessed via the internet.
+Edge computing processes data closer to where it is generated instead of relying entirely on cloud servers.
+5G is the fifth generation of mobile networks with higher speeds and lower latency.
+Blockchain uses cryptography to secure transactions in a distributed ledger.
+Smart contracts are self-executing contracts stored on a blockchain.
+Cryptography is the practice of securing communication and data from unauthorized access.
+A firewall is a network security system that monitors and controls incoming and outgoing traffic.
+Antivirus software protects computers from malware and viruses.
+Virtual machines emulate a physical computer in software, allowing multiple OS instances on a single machine.
+Augmented reality enhances real-world environments with digital overlays.
+Virtual reality immerses users in a completely digital environment.
+Drones are unmanned aerial vehicles controlled remotely or autonomously.
+3D modeling creates digital representations of objects using specialized software.
+Laser cutting uses a laser to cut materials with precision for engineering or craft projects.
+Solar panels convert sunlight into electrical energy.
+Wind turbines generate electricity by converting wind energy into mechanical energy.
+Hydropower generates electricity by using the energy of moving water.
+A chemical reaction occurs when substances interact to form new products.
+Photosynthesis is the process by which plants convert sunlight into chemical energy.
+The water cycle describes how water evaporates, condenses, and returns to the Earth as precipitation.
+Newton's law of universal gravitation describes the force of attraction between any two masses.
+The speed of light is approximately 299,792,458 meters per second.
+Electric current is the flow of electric charge through a conductor.
+Voltage is the potential difference that drives electric current.
+Resistance is the opposition to current flow in an electrical circuit.
+Ohm's law states that voltage equals current times resistance.
+The periodic table organizes elements by increasing atomic number and similar properties.
+An atom consists of a nucleus made of protons and neutrons, surrounded by electrons.
+DNA stores genetic information in living organisms.
+RNA plays a key role in protein synthesis.
+Enzymes catalyze biochemical reactions by lowering activation energy.
+Vaccines train the immune system to recognize and fight pathogens.
+The human brain has approximately 86 billion neurons.
+Black holes are regions in space where gravity is so strong that not even light can escape.
+The Milky Way is the galaxy that contains our Solar System.
+Satellites orbit Earth to provide communication, navigation, and observation services.
+Astronauts train extensively to survive and work in space.
+Telescope types include optical, radio, and space telescopes for observing the universe.
+Artificial satellites can monitor climate change, weather, and environmental conditions.
+Electric cars reduce carbon emissions by using batteries instead of fossil fuels.
+Recycling reduces waste and conserves natural resources.
+Machine vision enables computers to process and interpret visual information.
+Natural language processing allows computers to understand and generate human language.
+Chatbots use AI to simulate human conversation in text or voice interfaces.
+Recommendation systems suggest content or products based on user preferences.
+Wearable technology monitors health metrics like heart rate and activity levels.
+Nanotechnology manipulates matter at the atomic and molecular scale.
+Biotechnology applies biological systems to develop products and solutions.
+CRISPR is a genome-editing tool used to modify DNA sequences.
+Hydrogen fuel cells generate electricity by combining hydrogen and oxygen, producing water.
+Telemedicine allows patients to consult doctors remotely using technology.
+Internet of Things connects devices like sensors, appliances, and vehicles to the internet.
+Smart homes automate lighting, climate, security, and entertainment systems.
+Coding bootcamps teach programming skills intensively over a short period.
+Open-source software is freely available for anyone to use, modify, and distribute.
+Data privacy involves protecting personal information from unauthorized access.
+Encryption ensures that data is only readable by intended parties.
+Machine ethics studies how AI systems should make ethical decisions.
+Virtual assistants like Siri and Alexa respond to voice commands using AI.
+Digital twins are virtual replicas of physical systems for monitoring and simulation.
+Bioinformatics uses computational tools to analyze biological data.
+Genomics studies the complete set of DNA in an organism.
+Proteomics studies the full set of proteins produced by a genome.
+E-commerce platforms enable online buying and selling of products and services.
+Augmented reality in education can enhance learning through interactive simulations.
+Edge AI processes data on devices rather than sending it to centralized servers.
+Cyber-physical systems integrate computation, networking, and physical processes.

@@ -1,31 +1,32 @@
-import requests
+import os
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "mistral"
+# Get correct file path (important for Render)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+knowledge_path = os.path.join(BASE_DIR, "security_knowledge.txt")
 
-session = requests.Session()
+# Load knowledge base
+with open(knowledge_path, "r", encoding="utf-8") as f:
+    knowledge_base = f.read().split("\n\n")
 
-def generate_response(prompt):
-    try:
-        response = session.post(
-            OLLAMA_URL,
-            json={
-                "model": MODEL_NAME,
-                "prompt": prompt,
-                "stream": False,
-               "options": {
-    "num_predict": 250,
-    "temperature": 0.7,
-    "num_ctx": 1024
-}
-            },
-            timeout=180
-        )
+# Convert knowledge text into vectors
+vectorizer = TfidfVectorizer()
+vectors = vectorizer.fit_transform(knowledge_base)
 
-        response.raise_for_status()
-        data = response.json()
 
-        return data.get("response", "").strip()
+def generate_response(user_input):
 
-    except Exception as e:
-        return f"Error: {str(e)}"
+    if not user_input:
+        return "Please ask a cybersecurity question."
+
+    # Convert user input into vector
+    user_vector = vectorizer.transform([user_input])
+
+    # Find similarity
+    similarity = cosine_similarity(user_vector, vectors)
+
+    # Get best answer
+    best_index = similarity.argmax()
+
+    return knowledge_base[best_index]

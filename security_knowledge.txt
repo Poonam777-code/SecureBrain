@@ -1,0 +1,15 @@
+Phishing is a cyber attack where attackers trick users into revealing sensitive information through fake emails or websites.
+
+Malware is malicious software designed to damage systems or steal data.
+
+Public WiFi networks can expose your data to attackers if not encrypted.
+
+Always check HTTPS and verify the domain before entering passwords.
+
+Strong passwords and two-factor authentication help protect your accounts.
+
+Suspicious popups asking for login credentials may be phishing attempts.
+
+Downloading software from unknown websites may introduce malware.
+
+Keeping your system updated helps fix security vulnerabilities.

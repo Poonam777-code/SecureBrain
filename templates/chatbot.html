@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SecureBrain Chat</title>
+    <link rel="stylesheet" href="/static/css/chatbot.css">
+</head>
+<body>
+
+<div class="chat-wrapper">
+
+    <div class="chat-header">
+        🤖 SecureBrain Offline Chat Assistant
+    </div>
+
+    <div id="chatMessages" class="chat-messages">
+        <div class="bot-message">
+            <span>Hello! I am running fully offline using Ollama.</span>
+        </div>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Ask SecureBrain..." onkeypress="handleKey(event)">
+        <button onclick="sendMessage()">➤</button>
+    </div>
+
+</div>
+<script>
+function sendMessage() {
+
+    const input = document.getElementById("chatInput");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    const chatBox = document.getElementById("chatMessages");
+
+    // Show user message
+    chatBox.innerHTML += `
+        <div class="user-message">
+            <span>${message}</span>
+        </div>
+    `;
+
+    input.value = "";
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        chatBox.innerHTML += `
+            <div class="bot-message">
+                <span>${data.response}</span>
+            </div>
+        `;
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(err => {
+        console.error(err);
+    });
+}
+
+function handleKey(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+}
+</script>
+</body>
+</html>

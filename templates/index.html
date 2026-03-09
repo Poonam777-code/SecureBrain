@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>SecureBrain</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="brand">SecureBrain</div>
+    <div class="private-mode">🟢 Private Mode</div>
+</div>
+
+<div class="center-container">
+
+```
+<div class="shield">🛡️</div>
+
+<h1>SecureBrain</h1>
+<p class="subtitle">Private. Secure. Yours.</p>
+
+<!-- SEARCH BOX -->
+<div class="search-box">
+    <input id="searchInput" placeholder="Search privately..." />
+    <button onclick="handleSearch()">Search</button>
+</div>
+
+<p class="assistant-text">
+    Your search will be answered by our AI assistant
+</p>
+
+<div class="action-buttons">
+
+    <!-- AI ASSISTANT -->
+    <button class="secondary-btn"
+        onclick="window.open('/chatbot', 'SecureBrainChat',
+        'width=1100,height=750,resizable=yes,scrollbars=yes')">
+        🤖 AI Assistant
+    </button>
+
+    <!-- URL CHECK -->
+    <button class="secondary-btn" onclick="openUrlCheckPage()">
+        🛡 URL Safety Check
+    </button>
+
+</div>
+
+<div class="feature-row">
+
+    <div class="feature">🟢 Private Mode</div>
+    <div class="feature">📂 History stored locally</div>
+    <div class="feature">🚫 No Tracking</div>
+    <div class="feature">🔒 Encrypted AI</div>
+
+    <!-- BLOCKED SITES BUTTON -->
+    <a href="/blocked-sites">
+        <button class="blocked-btn">🔒 View Blocked Sites</button>
+    </a>
+
+</div>
+```
+
+</div>
+
+<script>
+
+/* OPEN URL CHECK PAGE */
+function openUrlCheckPage() {
+    window.location.href = "/url-check";
+}
+
+
+/* SEARCH BOX FUNCTION */
+function handleSearch() {
+
+    let query = document.getElementById("searchInput").value.trim();
+
+    if(query === ""){
+        alert("Please enter something to search");
+        return;
+    }
+
+    /* detect if user typed a URL */
+    let isURL = query.includes(".") && !query.includes(" ");
+
+    if(isURL){
+
+        /* redirect to SecureBrain URL checker */
+        window.location.href = "/url-check?target=" + encodeURIComponent(query);
+
+    }
+    else{
+
+        /* open private search */
+        let searchURL = "https://duckduckgo.com/?q=" + encodeURIComponent(query);
+
+        window.open(searchURL,"_blank");
+
+    }
+
+}
+
+
+/* ENTER KEY SEARCH */
+document.getElementById("searchInput").addEventListener("keypress", function(e){
+
+    if(e.key === "Enter"){
+        handleSearch();
+    }
+
+});
+
+</script>
+
+</body>
+</html>

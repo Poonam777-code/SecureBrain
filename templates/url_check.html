@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>URL Safety Checker</title>
+
+<style>
+
+body{
+background:#cfd8d3;
+font-family:Arial;
+}
+
+.url-check-container{
+width:420px;
+margin:120px auto;
+background:#111;
+padding:30px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+.url-check-container h2{
+color:white;
+margin-bottom:20px;
+}
+
+.url-check-container input{
+width:90%;
+padding:10px;
+border-radius:6px;
+border:1px solid #2ecc71;
+margin-bottom:15px;
+}
+
+.url-check-container button{
+padding:10px 20px;
+background:#2ecc71;
+border:none;
+border-radius:6px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.url-check-container button:hover{
+background:#27ae60;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="url-check-container">
+
+<h2>🛡 URL Safety Checker</h2>
+
+<input type="text" id="urlInput" placeholder="Enter URL">
+
+<br>
+
+<button onclick="checkURL()">Check</button>
+
+</div>
+
+<script>
+
+
+function getBlockedSites(){
+return JSON.parse(localStorage.getItem("blocked_sites")) || [];
+}
+
+
+function saveBlockedSite(url){
+
+let blocked=getBlockedSites();
+
+if(!blocked.includes(url)){
+blocked.push(url);
+localStorage.setItem("blocked_sites",JSON.stringify(blocked));
+}
+
+}
+
+
+function unblockSite(url){
+
+let blocked=getBlockedSites();
+
+blocked=blocked.filter(site=>site!==url);
+
+localStorage.setItem("blocked_sites",JSON.stringify(blocked));
+
+alert("Website unblocked");
+
+}
+
+
+function checkURL(){
+
+let url=document.getElementById("urlInput").value.trim();
+
+if(!url){
+alert("Enter URL");
+return;
+}
+
+if(!url.startsWith("http")){
+url="http://"+url;
+}
+
+
+let blocked=getBlockedSites();
+
+if(blocked.includes(url)){
+
+let choice=confirm(
+"🚫 This website is blocked.\n\nPress OK to unblock and open.\nPress Cancel to stay blocked."
+);
+
+if(choice){
+unblockSite(url);
+window.open(url,"_blank");
+}
+
+return;
+}
+
+
+
+fetch("/check_url",{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({url:url})
+
+})
+
+.then(res=>res.json())
+.then(data=>{
+
+let reasons=data.reasons.join("\n");
+
+let message=
+"Security Level: "+data.security_level+
+"\nRisk Score: "+data.risk_score+
+"\n\nIssues Detected:\n"+reasons;
+
+if(data.security_level==="Safe" || data.security_level==="Very Secure"){
+
+alert("✅ SAFE WEBSITE\n\n"+message);
+
+window.open(url,"_blank");
+
+}else{
+
+let userChoice=confirm(
+"⚠ Website may be unsafe!\n\n"+
+message+
+"\n\nOK = Proceed with caution\nCancel = Block Website"
+);
+
+if(userChoice){
+
+window.open(url,"_blank");
+
+}else{
+
+saveBlockedSite(url);
+
+alert("🚫 Website blocked and saved locally.");
+
+}
+
+}
+
+})
+
+.catch(()=>{
+alert("Error checking URL");
+});
+
+}
+
+</script>
+
+</body>
+
+</html>

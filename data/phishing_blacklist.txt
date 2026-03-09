@@ -1,0 +1,7 @@
+login
+verify
+bank
+update-account
+free-money
+crypto
+paypal

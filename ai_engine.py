@@ -15,7 +15,9 @@ model = None
 def get_model():
     global model
     if model is None:
+        print("Loading embedding model...")
         model = SentenceTransformer("all-MiniLM-L6-v2")
+        print("Model loaded successfully")
     return model
 
 
@@ -31,7 +33,7 @@ if os.path.exists(kb_path):
     with open(kb_path, "r", encoding="utf-8") as f:
         knowledge = [k.strip() for k in f.read().split("\n\n") if k.strip()]
 
-# IMPORTANT: do NOT create embeddings at startup
+# Do NOT create embeddings at startup
 embeddings = None
 
 THRESHOLD = 0.60
@@ -40,13 +42,14 @@ HEADERS = {
     "User-Agent": "SecureBrainChatBot/1.0"
 }
 
+
 # -----------------------------
 # SPELL CORRECTION
 # -----------------------------
 def correct_spelling(query):
     try:
         return str(TextBlob(query).correct())
-    except:
+    except Exception:
         return query
 
 
@@ -67,14 +70,15 @@ def check_greeting(query):
 
 
 # -----------------------------
-# MATH SOLVER
+# SAFE MATH SOLVER
 # -----------------------------
 def solve_math(query):
 
     try:
         if re.match(r"^[0-9+\-*/ ().]+$", query):
-            return str(eval(query))
-    except:
+            result = eval(query, {"__builtins__": None}, {})
+            return str(result)
+    except Exception:
         pass
 
     return None
@@ -108,9 +112,11 @@ def search_knowledge(query):
 
     try:
 
-        # Create embeddings only once (first query)
+        # Create embeddings only on first query
         if embeddings is None:
+            print("Creating knowledge embeddings...")
             embeddings = get_model().encode(knowledge, convert_to_numpy=True)
+            print("Embeddings created")
 
         query_embedding = get_model().encode([query], convert_to_numpy=True)
 
@@ -122,8 +128,8 @@ def search_knowledge(query):
         if best_score >= THRESHOLD:
             return knowledge[best_index]
 
-    except:
-        pass
+    except Exception as e:
+        print("Embedding search error:", e)
 
     return None
 
@@ -134,7 +140,7 @@ def search_knowledge(query):
 def clean_text(text):
 
     text = re.sub(r'<.*?>', '', text)
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r"\s+", " ", text)
 
     return text.strip()
 
@@ -169,8 +175,8 @@ def stackexchange_search(query):
             if len(text) > 100:
                 return text[:700]
 
-    except:
-        pass
+    except Exception as e:
+        print("StackOverflow API error:", e)
 
     return None
 
@@ -194,7 +200,7 @@ def dictionary_search(query):
 
             return meaning
 
-    except:
+    except Exception:
         pass
 
     return None
@@ -225,7 +231,7 @@ def wikidata_search(query):
         if results:
             return results[0].get("description")
 
-    except:
+    except Exception:
         pass
 
     return None
@@ -274,8 +280,8 @@ def wikipedia_search(query):
         if extract:
             return extract[:700]
 
-    except:
-        pass
+    except Exception as e:
+        print("Wikipedia API error:", e)
 
     return None
 

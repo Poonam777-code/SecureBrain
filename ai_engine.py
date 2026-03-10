@@ -118,7 +118,7 @@ def search_knowledge(query):
 def clean_text(text):
 
     text = re.sub('<.*?>', '', text)
-    text = re.sub('\s+', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
 

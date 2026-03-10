@@ -8,7 +8,7 @@ import re
 from urllib.parse import quote
 
 # -----------------------------
-# LOAD MODEL (LAZY LOADING)
+# LOAD MODEL (LAZY)
 # -----------------------------
 model = None
 
@@ -19,6 +19,9 @@ def get_model():
     return model
 
 
+# -----------------------------
+# LOAD KNOWLEDGE BASE
+# -----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 kb_path = os.path.join(BASE_DIR, "knowledge_base.txt")
 
@@ -28,8 +31,8 @@ if os.path.exists(kb_path):
     with open(kb_path, "r", encoding="utf-8") as f:
         knowledge = [k.strip() for k in f.read().split("\n\n") if k.strip()]
 
-# embeddings created only if knowledge exists
-embeddings = get_model().encode(knowledge, convert_to_numpy=True) if knowledge else np.array([])
+# IMPORTANT: do NOT create embeddings at startup
+embeddings = None
 
 THRESHOLD = 0.60
 
@@ -98,17 +101,22 @@ def is_programming_question(query):
 # -----------------------------
 def search_knowledge(query):
 
-    if len(embeddings) == 0:
+    global embeddings
+
+    if not knowledge:
         return None
 
     try:
+
+        # Create embeddings only once (first query)
+        if embeddings is None:
+            embeddings = get_model().encode(knowledge, convert_to_numpy=True)
 
         query_embedding = get_model().encode([query], convert_to_numpy=True)
 
         similarity = cosine_similarity(query_embedding, embeddings)[0]
 
         best_index = np.argmax(similarity)
-
         best_score = similarity[best_index]
 
         if best_score >= THRESHOLD:
@@ -125,7 +133,7 @@ def search_knowledge(query):
 # -----------------------------
 def clean_text(text):
 
-    text = re.sub('<.*?>', '', text)
+    text = re.sub(r'<.*?>', '', text)
     text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
@@ -266,8 +274,8 @@ def wikipedia_search(query):
         if extract:
             return extract[:700]
 
-    except Exception as e:
-        print("Wikipedia error:", e)
+    except:
+        pass
 
     return None
 

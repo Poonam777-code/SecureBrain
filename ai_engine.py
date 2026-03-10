@@ -8,9 +8,16 @@ import re
 from urllib.parse import quote
 
 # -----------------------------
-# LOAD MODEL
+# LOAD MODEL (LAZY LOADING)
 # -----------------------------
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 kb_path = os.path.join(BASE_DIR, "knowledge_base.txt")
@@ -21,7 +28,8 @@ if os.path.exists(kb_path):
     with open(kb_path, "r", encoding="utf-8") as f:
         knowledge = [k.strip() for k in f.read().split("\n\n") if k.strip()]
 
-embeddings = model.encode(knowledge, convert_to_numpy=True) if knowledge else np.array([])
+# embeddings created only if knowledge exists
+embeddings = get_model().encode(knowledge, convert_to_numpy=True) if knowledge else np.array([])
 
 THRESHOLD = 0.60
 
@@ -95,7 +103,7 @@ def search_knowledge(query):
 
     try:
 
-        query_embedding = model.encode([query], convert_to_numpy=True)
+        query_embedding = get_model().encode([query], convert_to_numpy=True)
 
         similarity = cosine_similarity(query_embedding, embeddings)[0]
 
@@ -121,6 +129,7 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
+
 
 # -----------------------------
 # STACKOVERFLOW SEARCH
@@ -184,7 +193,7 @@ def dictionary_search(query):
 
 
 # -----------------------------
-# WIKIDATA SEARCH (SHORT ANSWER)
+# WIKIDATA SEARCH
 # -----------------------------
 def wikidata_search(query):
 
@@ -215,7 +224,7 @@ def wikidata_search(query):
 
 
 # -----------------------------
-# WIKIPEDIA SEARCH (REAL ANSWER)
+# WIKIPEDIA SEARCH
 # -----------------------------
 def wikipedia_search(query):
 
@@ -283,39 +292,32 @@ def generate_response(query):
 
     query = correct_spelling(query)
 
-    # Greeting
     greeting = check_greeting(query)
     if greeting:
         return greeting
 
-    # Math
     math = solve_math(query)
     if math:
         return math
 
-    # Knowledge base
     kb = search_knowledge(query)
     if kb:
         return kb
 
-    # Dictionary
     if len(query.split()) == 1:
         definition = dictionary_search(query)
         if definition:
             return definition
 
-    # Programming
     if is_programming_question(query):
         stack = stackexchange_search(query)
         if stack:
             return stack
 
-    # Wikidata (short answer)
     wikidata = wikidata_search(query)
     if wikidata:
         return wikidata
 
-    # Wikipedia (full answer)
     wiki = wikipedia_search(query)
     if wiki:
         return wiki

@@ -16,11 +16,10 @@ model = None
 def get_model():
     global model
     if model is None:
-        print("Loading embedding model...")
+        print("Loading SecureBrain AI model... Please wait.", flush=True)
         model = SentenceTransformer("all-MiniLM-L6-v2")
-        print("Model loaded successfully")
+        print("SecureBrain AI model loaded successfully.", flush=True)
     return model
-
 
 # -----------------------------
 # LOAD KNOWLEDGE BASE

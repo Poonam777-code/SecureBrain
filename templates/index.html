@@ -1,117 +1,85 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-    <title>SecureBrain</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureBrain</title>
+<link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
 
+<!-- NAVBAR -->
 <div class="navbar">
-    <div class="brand">SecureBrain</div>
+    <div class="brand">🛡 SecureBrain</div>
     <div class="private-mode">🟢 Private Mode</div>
 </div>
 
+<!-- CENTER -->
 <div class="center-container">
 
-```
-<div class="shield">🛡️</div>
+    <div class="shield">🛡️</div>
 
-<h1>SecureBrain</h1>
-<p class="subtitle">Private. Secure. Yours.</p>
+    <h1>SecureBrain</h1>
+    <p class="subtitle">Private. Secure. Yours.</p>
 
-<!-- SEARCH BOX -->
-<div class="search-box">
-    <input id="searchInput" placeholder="Search privately..." />
-    <button onclick="handleSearch()">Search</button>
-</div>
+    <!-- SEARCH -->
+    <div class="search-box">
+        <input id="searchInput" placeholder="Search privately..." />
+        <button onclick="handleSearch()">Search</button>
+    </div>
 
-<p class="assistant-text">
-    Your search will be answered by our AI assistant
-</p>
+    <p class="assistant-text">
+        Your search will be answered by our AI assistant
+    </p>
 
-<div class="action-buttons">
+    <!-- URL CHECK BUTTON -->
+    <div class="url-check-box">
+        <button onclick="window.location.href='/url-check'">
+            🛡 Check URL Safety
+        </button>
+    </div>
 
-    <!-- AI ASSISTANT -->
-    <button class="secondary-btn"
-        onclick="window.open('/chatbot', 'SecureBrainChat',
-        'width=1100,height=750,resizable=yes,scrollbars=yes')">
+    <!-- ACTION BUTTONS -->
+    <div class="action-buttons">
+
+        <button class="secondary-btn"
+        onclick="window.open('/chatbot','SecureBrainChat','width=1100,height=750,resizable=yes,scrollbars=yes')">
         🤖 AI Assistant
-    </button>
+        </button>
 
-    <!-- URL CHECK -->
-    <button class="secondary-btn" onclick="openUrlCheckPage()">
-        🛡 URL Safety Check
-    </button>
+        <button class="secondary-btn"
+        onclick="window.location.href='/blocked-sites'">
+        🔒 View Blocked Sites
+        </button>
 
-</div>
+    </div>
 
-<div class="feature-row">
-
-    <div class="feature">🟢 Private Mode</div>
-    <div class="feature">📂 History stored locally</div>
-    <div class="feature">🚫 No Tracking</div>
-    <div class="feature">🔒 Encrypted AI</div>
-
-    <!-- BLOCKED SITES BUTTON -->
-    <a href="/blocked-sites">
-        <button class="blocked-btn">🔒 View Blocked Sites</button>
-    </a>
-
-</div>
-```
+    <!-- FEATURES -->
+    <div class="feature-row">
+        <div class="feature">🟢 Private Mode</div>
+        <div class="feature">📂 History stored locally</div>
+        <div class="feature">🚫 No Tracking</div>
+        <div class="feature">🔒 Encrypted AI</div>
+    </div>
 
 </div>
 
 <script>
-
-/* OPEN URL CHECK PAGE */
-function openUrlCheckPage() {
-    window.location.href = "/url-check";
-}
-
-
-/* SEARCH BOX FUNCTION */
 function handleSearch() {
-
     let query = document.getElementById("searchInput").value.trim();
 
-    if(query === ""){
+    if (!query) {
         alert("Please enter something to search");
         return;
     }
 
-    /* detect if user typed a URL */
-    let isURL = query.includes(".") && !query.includes(" ");
-
-    if(isURL){
-
-        /* redirect to SecureBrain URL checker */
-        window.location.href = "/url-check?target=" + encodeURIComponent(query);
-
-    }
-    else{
-
-        /* open private search */
-        let searchURL = "https://duckduckgo.com/?q=" + encodeURIComponent(query);
-
-        window.open(searchURL,"_blank");
-
-    }
-
+    window.location.href = "/secure-search-page?query=" + encodeURIComponent(query);
 }
 
-
-/* ENTER KEY SEARCH */
-document.getElementById("searchInput").addEventListener("keypress", function(e){
-
-    if(e.key === "Enter"){
-        handleSearch();
-    }
-
+document.getElementById("searchInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") handleSearch();
 });
-
 </script>
 
 </body>

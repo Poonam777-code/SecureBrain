@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
 
@@ -7,46 +6,102 @@
 
 <style>
 
+/* ===== BODY ===== */
 body{
-background:#cfd8d3;
-font-family:Arial;
+    margin:0;
+    font-family:Arial;
+
+    background: linear-gradient(-45deg, #eefaf4, #e6f7ef, #f3fcf8, #f7fffb);
+    background-size: 400% 400%;
+    animation: gradientMove 16s ease infinite;
+
+    color:#2f3e34;
 }
 
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ===== CONTAINER ===== */
 .url-check-container{
-width:420px;
-margin:120px auto;
-background:#111;
-padding:30px;
-border-radius:10px;
-text-align:center;
-box-shadow:0 0 20px rgba(0,0,0,0.4);
+    width:420px;
+    margin:120px auto;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(8px);
+
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+
+    animation: floatCard 6s ease-in-out infinite;
 }
 
+@keyframes floatCard{
+    0%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+    100%{transform:translateY(0);}
+}
+
+/* ===== TITLE ===== */
 .url-check-container h2{
-color:white;
-margin-bottom:20px;
+    color:#34c77b;
+    margin-bottom:20px;
 }
 
+/* ===== INPUT ===== */
 .url-check-container input{
-width:90%;
-padding:10px;
-border-radius:6px;
-border:1px solid #2ecc71;
-margin-bottom:15px;
+    width:90%;
+    padding:12px;
+    border-radius:30px;
+    border:1px solid #d6eee3;
+    margin-bottom:18px;
+
+    background:#ffffff;
+    outline:none;
+    transition:0.3s;
 }
 
+.url-check-container input:focus{
+    border-color:#34c77b;
+    box-shadow:0 0 8px rgba(52,199,123,0.3);
+}
+
+/* ===== GREEN BUTTON (MAIN FIX) ===== */
 .url-check-container button{
-padding:10px 20px;
-background:#2ecc71;
-border:none;
-border-radius:6px;
-color:white;
-font-weight:bold;
-cursor:pointer;
+    padding:12px 28px;
+
+    background: linear-gradient(135deg, #34c77b, #2fbf72);
+
+    border:none;
+    border-radius:30px;
+
+    color:white;
+    font-weight:600;
+    font-size:14px;
+
+    cursor:pointer;
+    transition: all 0.25s ease;
+
+    box-shadow: 0 4px 12px rgba(52,199,123,0.25);
 }
 
+/* hover */
 .url-check-container button:hover{
-background:#27ae60;
+    transform: translateY(-2px) scale(1.05);
+
+    box-shadow:
+        0 8px 20px rgba(52,199,123,0.35),
+        0 0 10px rgba(52,199,123,0.2);
+}
+
+/* click */
+.url-check-container button:active{
+    transform: scale(0.96);
+    box-shadow: 0 3px 8px rgba(52,199,123,0.2);
 }
 
 </style>
@@ -69,39 +124,26 @@ background:#27ae60;
 
 <script>
 
-
 function getBlockedSites(){
 return JSON.parse(localStorage.getItem("blocked_sites")) || [];
 }
 
-
 function saveBlockedSite(url){
-
 let blocked=getBlockedSites();
-
 if(!blocked.includes(url)){
 blocked.push(url);
 localStorage.setItem("blocked_sites",JSON.stringify(blocked));
 }
-
 }
-
 
 function unblockSite(url){
-
 let blocked=getBlockedSites();
-
 blocked=blocked.filter(site=>site!==url);
-
 localStorage.setItem("blocked_sites",JSON.stringify(blocked));
-
 alert("Website unblocked");
-
 }
 
-
 function checkURL(){
-
 let url=document.getElementById("urlInput").value.trim();
 
 if(!url){
@@ -113,11 +155,9 @@ if(!url.startsWith("http")){
 url="http://"+url;
 }
 
-
 let blocked=getBlockedSites();
 
 if(blocked.includes(url)){
-
 let choice=confirm(
 "🚫 This website is blocked.\n\nPress OK to unblock and open.\nPress Cancel to stay blocked."
 );
@@ -130,18 +170,13 @@ window.open(url,"_blank");
 return;
 }
 
-
-
 fetch("/check_url",{
-
 method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({url:url})
-
 })
-
 .then(res=>res.json())
 .then(data=>{
 
@@ -155,7 +190,6 @@ let message=
 if(data.security_level==="Safe" || data.security_level==="Very Secure"){
 
 alert("✅ SAFE WEBSITE\n\n"+message);
-
 window.open(url,"_blank");
 
 }else{
@@ -167,29 +201,20 @@ message+
 );
 
 if(userChoice){
-
 window.open(url,"_blank");
-
 }else{
-
 saveBlockedSite(url);
-
 alert("🚫 Website blocked and saved locally.");
-
 }
-
 }
 
 })
-
 .catch(()=>{
 alert("Error checking URL");
 });
-
 }
 
 </script>
 
 </body>
-
 </html>

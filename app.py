@@ -4,6 +4,7 @@ from risk_engine import analyze_url
 import requests
 from bs4 import BeautifulSoup
 from search_engine import on_search_click
+import os
 
 app = Flask(__name__, static_folder="static")
 
@@ -186,4 +187,5 @@ def blocked_sites():
 # RUN APP
 # =========================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=True)

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,22 +10,36 @@
 <div class="chat-wrapper">
 
     <div class="chat-header">
-        🤖 SecureBrain Offline Chat Assistant
+        🤖 SecureBrain AI Assistant
     </div>
 
     <div id="chatMessages" class="chat-messages">
         <div class="bot-message">
-            <span>Hello! I am running fully offline using Knowledge-Based AI.</span>
+            <span>Hello! I am your AI assistant. Ask me anything 😊</span>
         </div>
     </div>
 
     <div class="chat-input">
         <input type="text" id="chatInput" placeholder="Ask SecureBrain..." onkeypress="handleKey(event)">
+        
+        <button onclick="startVoice()">🎤</button>
         <button onclick="sendMessage()">➤</button>
     </div>
 
 </div>
+
 <script>
+
+// -----------------------------
+// SAFE TEXT
+// -----------------------------
+function escapeHTML(text) {
+    return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// -----------------------------
+// SEND MESSAGE
+// -----------------------------
 function sendMessage() {
 
     const input = document.getElementById("chatInput");
@@ -34,14 +49,23 @@ function sendMessage() {
 
     const chatBox = document.getElementById("chatMessages");
 
-    // Show user message
     chatBox.innerHTML += `
         <div class="user-message">
-            <span>${message}</span>
+            <span>${escapeHTML(message)}</span>
         </div>
     `;
 
     input.value = "";
+
+    const typingId = "typing-" + Date.now();
+
+    chatBox.innerHTML += `
+        <div class="bot-message" id="${typingId}">
+            <span>Typing...</span>
+        </div>
+    `;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
 
     fetch("/chat", {
         method: "POST",
@@ -53,24 +77,98 @@ function sendMessage() {
     .then(res => res.json())
     .then(data => {
 
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        const reply = data.response || "No response";
+
         chatBox.innerHTML += `
             <div class="bot-message">
-                <span>${data.response}</span>
+                <span>${escapeHTML(reply)}</span>
             </div>
         `;
 
         chatBox.scrollTop = chatBox.scrollHeight;
+
+        speakText(reply);
     })
     .catch(err => {
         console.error(err);
     });
 }
 
+// -----------------------------
+// ENTER KEY
+// -----------------------------
 function handleKey(event) {
     if (event.key === "Enter") {
         sendMessage();
     }
 }
+
+// -----------------------------
+// 🎤 VOICE INPUT (HTTPS READY)
+// -----------------------------
+function startVoice() {
+
+    if (!window.isSecureContext) {
+        alert("⚠️ Microphone requires HTTPS or localhost.");
+        return;
+    }
+
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("❌ Your browser does not support voice recognition. Use Chrome.");
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+        const text = event.results[0][0].transcript;
+        document.getElementById("chatInput").value = text;
+        sendMessage();
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Mic error:", event.error);
+
+        if (event.error === "not-allowed") {
+            alert("❌ Please allow microphone permission.");
+        } else {
+            alert("Voice error: " + event.error);
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch (e) {
+        alert("⚠️ Mic already in use. Try again.");
+    }
+}
+
+// -----------------------------
+// 🔊 TEXT TO SPEECH
+// -----------------------------
+function speakText(text) {
+
+    if (!('speechSynthesis' in window)) return;
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    speech.lang = "en-US";
+    speech.rate = 1;
+    speech.pitch = 1;
+
+    window.speechSynthesis.cancel(); // stop previous speech
+    window.speechSynthesis.speak(speech);
+}
+
 </script>
+
 </body>
 </html>
+

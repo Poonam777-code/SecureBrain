@@ -1,322 +1,284 @@
+
+import requests, re, os
+from bs4 import BeautifulSoup
+from urllib.parse import quote, urlparse
+from textblob import TextBlob
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from textblob import TextBlob
 import numpy as np
-import requests
-import os
-import re
-from urllib.parse import quote
-from functools import lru_cache
+
+HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 # -----------------------------
-# MODEL LOADING (LAZY)
+# LOAD MODEL
 # -----------------------------
-model = None
-
-def get_model():
-    global model
-    if model is None:
-        print("Loading SecureBrain AI model... Please wait.", flush=True)
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-        print("SecureBrain AI model loaded successfully.", flush=True)
-    return model
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # -----------------------------
 # LOAD KNOWLEDGE BASE
 # -----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-kb_path = os.path.join(BASE_DIR, "knowledge_base.txt")
+KB_FILE = os.path.join(BASE_DIR, "knowledge_base.txt")
 
-knowledge = []
+def load_kb():
+    if os.path.exists(KB_FILE):
+        with open(KB_FILE, "r", encoding="utf-8") as f:
+            return [k.strip() for k in f.read().split("\n\n") if k.strip()]
+    return []
 
-if os.path.exists(kb_path):
-    with open(kb_path, "r", encoding="utf-8") as f:
-        knowledge = [k.strip() for k in f.read().split("\n\n") if k.strip()]
-
-embeddings = None
-THRESHOLD = 0.45
-
-HEADERS = {
-    "User-Agent": "SecureBrainChatBot/1.0"
-}
-
+knowledge = load_kb()
+embeddings = model.encode(knowledge) if knowledge else None
 
 # -----------------------------
-# SPELL CORRECTION
+# SAVE NEW KNOWLEDGE
 # -----------------------------
-def correct_spelling(query):
+def save_kb(q, a):
     try:
-        return str(TextBlob(query).correct())
-    except:
-        return query
-
-
-# -----------------------------
-# GREETING
-# -----------------------------
-def check_greeting(query):
-
-    greetings = [
-        "hi","hello","hey","hii",
-        "good morning","good evening","good afternoon"
-    ]
-
-    query = query.lower()
-
-    for g in greetings:
-        if query.startswith(g):
-            return "Hello! How can I help you today?"
-
-    return None
-
-
-# -----------------------------
-# SAFE MATH SOLVER
-# -----------------------------
-def solve_math(query):
-
-    try:
-        if re.fullmatch(r"[0-9+\-*/ ().]+", query):
-            result = eval(query, {"__builtins__":None}, {})
-            return str(result)
+        with open(KB_FILE, "a", encoding="utf-8") as f:
+            f.write(f"\n\n{a}")
     except:
         pass
 
-    return None
-
+# -----------------------------
+# CLEAN
+# -----------------------------
+def clean(text):
+    text = re.sub(r"<.*?>", "", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
 
 # -----------------------------
-# PROGRAMMING DETECTOR
+# SPELL FIX
 # -----------------------------
-def is_programming_question(query):
-
-    keywords = [
-        "python","java","c++","javascript","html",
-        "css","sql","error","bug","algorithm",
-        "function","loop","class","compile",
-        "program","code","exception"
-    ]
-
-    q = query.lower()
-
-    return any(k in q for k in keywords)
-
+def fix(q):
+    try:
+        if len(q.split()) <= 3:
+            return str(TextBlob(q).correct())
+    except:
+        pass
+    return q
 
 # -----------------------------
-# KNOWLEDGE SEARCH (LOCAL AI)
+# NORMALIZE
 # -----------------------------
-def search_knowledge(query):
+def normalize(q):
+    q = q.lower()
+    q = re.sub(r"[^\w\s]", "", q)
+    return q.strip()
 
-    global embeddings
+# -----------------------------
+# KB SEARCH (AI 🔥)
+# -----------------------------
+def search_kb(q):
+    global embeddings, knowledge
 
+    knowledge = load_kb()
     if not knowledge:
         return None
 
-    try:
+    embeddings = model.encode(knowledge)
 
-        if embeddings is None:
-            print("Creating knowledge embeddings...")
-            embeddings = get_model().encode(
-                knowledge,
-                convert_to_numpy=True,
-                normalize_embeddings=True
-            )
+    q_emb = model.encode([q])
+    sim = cosine_similarity(q_emb, embeddings)[0]
 
-        query_embedding = get_model().encode(
-            [query],
-            convert_to_numpy=True,
-            normalize_embeddings=True
-        )
+    idx = np.argmax(sim)
 
-        similarity = cosine_similarity(query_embedding, embeddings)[0]
-
-        best_index = np.argmax(similarity)
-        best_score = similarity[best_index]
-
-        if best_score >= THRESHOLD:
-            return knowledge[best_index]
-
-    except Exception as e:
-        print("Embedding search error:", e)
+    if sim[idx] > 0.5:
+        return knowledge[idx]
 
     return None
 
-
 # -----------------------------
-# CLEAN TEXT
+# DUCKDUCKGO API
 # -----------------------------
-def clean_text(text):
-
-    text = re.sub(r"<.*?>", "", text)
-    text = re.sub(r"\s+", " ", text)
-
-    return text.strip()
-
-
-# -----------------------------
-# WIKIPEDIA SEARCH (CACHED)
-# -----------------------------
-@lru_cache(maxsize=100)
-def wikipedia_search(query):
-
+def ddg(q):
     try:
-
-        search_url = "https://en.wikipedia.org/w/api.php"
-
-        params = {
-            "action":"query",
-            "list":"search",
-            "srsearch":query,
-            "format":"json"
-        }
-
-        r = requests.get(search_url, params=params, headers=HEADERS, timeout=8)
-
-        data = r.json()
-
-        results = data.get("query", {}).get("search", [])
-
-        if not results:
-            return None
-
-        title = results[0]["title"]
-
-        encoded = quote(title)
-
-        summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}"
-
-        r = requests.get(summary_url, headers=HEADERS, timeout=8)
-
-        if r.status_code != 200:
-            return None
-
-        summary = r.json()
-
-        extract = summary.get("extract")
-
-        if extract:
-            return extract[:700]
-
-    except Exception as e:
-        print("Wikipedia API error:", e)
-
-    return None
-
-
-# -----------------------------
-# DICTIONARY SEARCH
-# -----------------------------
-def dictionary_search(query):
-
-    try:
-
-        url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{query}"
-
-        r = requests.get(url, headers=HEADERS, timeout=8)
-
-        data = r.json()
-
-        if isinstance(data, list):
-
-            definition = data[0]["meanings"][0]["definitions"][0]["definition"]
-
-            return definition
-
+        url = f"https://api.duckduckgo.com/?q={q}&format=json"
+        data = requests.get(url, timeout=5).json()
+        if data.get("AbstractText"):
+            return data["AbstractText"]
     except:
         pass
-
     return None
 
-
 # -----------------------------
-# STACKOVERFLOW SEARCH
+# WIKIPEDIA
 # -----------------------------
-def stackexchange_search(query):
-
+def wiki(q):
     try:
+        search = requests.get(
+            "https://en.wikipedia.org/w/api.php",
+            params={"action":"query","list":"search","srsearch":q,"format":"json"},
+            timeout=6
+        ).json()
 
-        url = "https://api.stackexchange.com/2.3/search/advanced"
+        results = search.get("query",{}).get("search",[])
+        if results:
+            title = results[0]["title"]
 
-        params = {
-            "order":"desc",
-            "sort":"relevance",
-            "q":query,
-            "site":"stackoverflow",
-            "filter":"withbody"
-        }
+            res = requests.get(
+                f"https://en.wikipedia.org/api/rest_v1/page/summary/{quote(title)}",
+                timeout=6
+            )
 
-        r = requests.get(url, params=params, timeout=8)
-
-        data = r.json()
-
-        items = data.get("items", [])
-
-        if items:
-
-            text = clean_text(items[0].get("body",""))
-
-            if len(text) > 100:
-                return text[:700]
-
-    except Exception as e:
-        print("StackOverflow API error:", e)
-
+            if res.status_code == 200:
+                return res.json().get("extract")
+    except:
+        pass
     return None
 
+# -----------------------------
+# WEB SEARCH
+# -----------------------------
+def web(q):
+    try:
+        url = f"https://html.duckduckgo.com/html/?q={q}"
+        r = requests.get(url, headers=HEADERS, timeout=6)
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        for a in soup.find_all("a", class_="result__a"):
+            link = a.get("href")
+
+            if "uddg=" in link:
+                import urllib.parse
+                link = urllib.parse.parse_qs(
+                    urllib.parse.urlparse(link).query
+                ).get("uddg", [""])[0]
+
+            page = requests.get(link, headers=HEADERS, timeout=5)
+            text = " ".join(p.get_text() for p in BeautifulSoup(page.text, "html.parser").find_all("p")[:5])
+
+            if len(text) > 150:
+                return clean(text)
+    except:
+        pass
+    return None
 
 # -----------------------------
-# FALLBACK
+# SUMMARIZE
 # -----------------------------
-def fallback_explanation(query):
-
-    return (
-        "I couldn't find an exact answer for that question. "
-        "Try asking in a different way or provide more details."
-    )
-
+def summarize(text):
+    parts = re.split(r'(?<=[.!?]) +', text)
+    return " ".join(parts[:3])[:500]
 
 # -----------------------------
-# MAIN CHATBOT ENGINE
+# MAIN ENGINE 🔥
 # -----------------------------
 def generate_response(query):
 
-    query = query.strip()
+    if not query.strip():
+        return "Please type something."
 
-    if not query:
-        return "Please type a question."
+    query = normalize(query)
+    query = fix(query)
 
-    query = correct_spelling(query)
+    # greeting
+    if query.split() and query.split()[0] in ["hi","hello","hey","hii"]:
+        return "Hello! 😊 How can I help you today?"
 
-    # Greeting
-    greeting = check_greeting(query)
-    if greeting:
-        return greeting
+    # math
+    try:
+        if re.fullmatch(r"[0-9+\-*/ ().]+", query):
+            return str(eval(query, {"__builtins__":None}, {}))
+    except:
+        pass
 
-    # Math
-    math = solve_math(query)
-    if math:
-        return math
-
-    # Local AI knowledge
-    kb = search_knowledge(query)
+    # 🔥 STEP 1: KNOWLEDGE BASE
+    kb = search_kb(query)
     if kb:
         return kb
 
-    # Wikipedia general knowledge
-    wiki = wikipedia_search(query)
-    if wiki:
-        return wiki
+    # 🔥 STEP 2: DUCKDUCKGO
+    d = ddg(query)
+    if d:
+        ans = summarize(d)
+        save_kb(query, ans)
+        return ans
 
-    # Dictionary for single words
-    if len(query.split()) == 1:
-        definition = dictionary_search(query)
-        if definition:
-            return definition
+    # 🔥 STEP 3: WIKIPEDIA
+    w = wiki(query)
+    if w:
+        ans = summarize(w)
+        save_kb(query, ans)
+        return ans
 
-    # Programming help
-    if is_programming_question(query):
-        stack = stackexchange_search(query)
-        if stack:
-            return stack
+    # 🔥 STEP 4: WEB
+    web_ans = web(query)
+    if web_ans:
+        ans = summarize(web_ans)
+        save_kb(query, ans)
+        return ans
 
-    return fallback_explanation(query)
+    return "I couldn't find a good answer. Try asking differently."
+
+
+def generate_response(query):
+
+    if not query.strip():
+        return "Please type something."
+
+    original_query = query.lower().strip()
+
+    # -----------------------------
+    #  STRONG GREETING DETECTION (FIRST)
+    # -----------------------------
+    greetings = [
+        "hi","hello","hey","hii","hiii","helo","helloo","gello"
+    ]
+
+    if any(original_query.startswith(g) for g in greetings):
+        return "Hello! 😊 How can I help you today?"
+
+    # -----------------------------
+    # NORMAL PROCESSING
+    # -----------------------------
+    query = normalize(query)
+    query = fix(query)
+
+    # -----------------------------
+    # MATH
+    # -----------------------------
+    try:
+        if re.fullmatch(r"[0-9+\-*/ ().]+", query):
+            return str(eval(query, {"__builtins__":None}, {}))
+    except:
+        pass
+
+    # -----------------------------
+    # 🔥 KNOWLEDGE BASE
+    # -----------------------------
+    kb = search_kb(query)
+    if kb:
+        return kb
+
+    # -----------------------------
+    # DUCKDUCKGO
+    # -----------------------------
+    d = ddg(query)
+    if d:
+        ans = summarize(d)
+        save_kb(query, ans)
+        return ans
+
+    # -----------------------------
+    # WIKIPEDIA
+    # -----------------------------
+    w = wiki(query)
+    if w:
+        ans = summarize(w)
+        save_kb(query, ans)
+        return ans
+
+    # -----------------------------
+    # WEB SEARCH
+    # -----------------------------
+    web_ans = web(query)
+    if web_ans:
+        ans = summarize(web_ans)
+        save_kb(query, ans)
+        return ans
+
+    # -----------------------------
+    # FINAL FALLBACK
+    # -----------------------------
+    return f"{query.capitalize()} is a general topic. Please try asking more clearly."

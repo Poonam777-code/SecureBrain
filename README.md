@@ -72,7 +72,7 @@ SecureBrain/
 ## ⚙️ Installation
 
 ## 1. Clone the repo
-```bash
+bash
 git clone https://github.com/your-username/SecureBrain.git
 cd SecureBrain
 2. Install dependencies
@@ -80,8 +80,15 @@ pip install -r requirements.txt
 3. Run the app
 python app.py
 
+## 📸 Screenshots
 
-## 🏗️ Project Structure
+![Homepage](assets/homepage.png)
+![Search Bar](assets/searchbar.png)
+![Search Output](assets/search-output.png)
+![Chatbot](assets/chatbot.png)
+![URL Checking](assets/url-checking.png)
+![URL Check Result](assets/url-check-result.png)
+![Blocksite](assets/blocksite.png)
 
 ![Homepage](assets/homepage.png)
 ![Search Bar](assets/searchbar.png)

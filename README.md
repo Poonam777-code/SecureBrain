@@ -83,11 +83,17 @@ python app.py
 ## 📸 Screenshots
 
 ![Homepage](assets/homepage.png)
+<br>
 ![Search Bar](assets/searchbar.png)
+<br>
 ![Search Output](assets/srchbar-output.png)
+<br>
 ![Chatbot](assets/chatbot.png)
+<br>
 ![URL Checking](assets/url-checking.png)
+<br>
 ![URL Check Result](assets/url-check-result.png)
+<br>
 ![Blocksite](assets/blocksite.png)
 
 

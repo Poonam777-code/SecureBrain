@@ -90,10 +90,4 @@ python app.py
 ![URL Check Result](assets/url-check-result.png)
 ![Blocksite](assets/blocksite.png)
 
-![Homepage](assets/homepage.png)
-![Search Bar](assets/searchbar.png)
-![Search Output](assets/search-output.png)
-![Chatbot](assets/chatbot.png)
-![URL Checking](assets/url-checking.png)
-![URL Check Result](assets/url-check-result.png)
-![Blocksite](assets/blocksite.png)
+
